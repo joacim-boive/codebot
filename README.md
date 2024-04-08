@@ -1,1 +1,1 @@
-AI ChatBot that validates its code suggestions
+AI ChatBot that validates its code suggestions.
