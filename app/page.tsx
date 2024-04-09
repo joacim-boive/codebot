@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { executeCode, modifyCode } from "./utils/codeExecutor";
 import { Input } from "@/components/ui/input";
