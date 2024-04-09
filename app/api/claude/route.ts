@@ -2,14 +2,14 @@ import { Anthropic } from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import db, { setupDatabase } from "./database";
 
-interface Message {
+type Message = {
   role: "user" | "assistant";
   content: string;
-}
+};
 
-interface ChatPrompt {
+type ChatPrompt = {
   messages: Message[];
-}
+};
 
 const { MODEL = "claude-3-opus-20240229", MAX_TOKENS = 1024 } = process.env;
 const client = new Anthropic();
@@ -42,15 +42,15 @@ export async function POST(request: Request) {
       messages: conversationHistory,
     };
 
-    // Send the prompt to the Claude API using the Anthropic SDK
+    //Send the prompt to the Claude API using the Anthropic SDK
     const response = await client.messages.create({
       model: MODEL,
       max_tokens: Number(MAX_TOKENS),
       messages: prompt.messages,
     });
 
-    // Extract the suggested code from the response
-    const suggestedCode = response.content;
+    // // Extract the suggested code from the response
+    const suggestedCode = response.content.slice(-1)[0].text;
 
     // Add the assistant's response to the conversation history
     await db("conversations").insert({
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
 
     // Return the suggested code
     return NextResponse.json({
-      suggestedCode: suggestedCode.slice(-1)[0].text,
+      suggestedCode,
     });
   } catch (error) {
     console.error("Error communicating with Claude API:", error);
