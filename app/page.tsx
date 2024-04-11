@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable react/no-children-prop */
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
@@ -11,7 +13,7 @@ import { PropagateLoader } from 'react-spinners'
 import { motion } from 'framer-motion'
 import Markdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { a11yDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Message } from '@/types/messages'
 
 const messageVariants = {
@@ -138,7 +140,7 @@ export default function Home() {
       `}</style>
       {/* This is so that code examples doesn't break out of the layout */}
 
-      <div className="container mx-auto p-4 max-w-3xl mb-3">
+      <div className="container mx-auto p-4 max-w-4xl mb-3">
         <div className="flex flex-col items-center">
           <Image
             priority={false}
@@ -175,7 +177,29 @@ export default function Home() {
                       : 'bg-gray-200 text-gray-800'
                   } ${message.role === 'assistant' ? 'ml-4' : ''}`}
                 >
-                  <Markdown>{message.content}</Markdown>
+                  <Markdown
+                    // eslint-disable-next-line react/no-children-prop
+                    children={message.content}
+                    components={{
+                      code(props) {
+                        const { children, className, ...rest } = props
+                        const match = /language-(\w+)/.exec(className || '')
+                        return match ? (
+                          <SyntaxHighlighter
+                            {...rest}
+                            PreTag="div"
+                            children={String(children).replace(/\n$/, '')}
+                            language={match[1]}
+                            style={a11yDark}
+                          />
+                        ) : (
+                          <code {...rest} className={className}>
+                            {children}
+                          </code>
+                        )
+                      },
+                    }}
+                  />
                 </div>
               </motion.div>
             ))}
