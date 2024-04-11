@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "tsc": "tsc",
-    "eslint": "eslint"
+    "eslint": "eslint './temp/**/*.{ts,tsx}'"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.2",

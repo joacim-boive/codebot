@@ -1,16 +1,14 @@
 import axios from 'axios'
 
 interface ExecutionResult {
-  code: string
-  filename: string
-  errors: string[]
+  data: { errors?: { type: string; error: string }[] }
 }
 
 export async function executeCode(code: string) {
-  const pattern = /\/\/FILENAME: (\w+\.(tsx|ts))\n```(tsx|ts)\n([\s\S]*?)\n```/g
+  const pattern =
+    /\/\/FILENAME: (\w+\.(tsx|ts))\n```(tsx|typescript)\n([\s\S]*?)\n```/g
   const files = []
-
-  let executionResults: ExecutionResult[] = []
+  let executionResults: ExecutionResult = { data: { errors: [] } }
   let match
 
   while ((match = pattern.exec(code)) !== null) {
@@ -18,6 +16,7 @@ export async function executeCode(code: string) {
     const code = match[4]
     files.push({ filename, code })
   }
+
   //No code to process
   if (files && files?.length < 1)
     return {
@@ -30,7 +29,8 @@ export async function executeCode(code: string) {
     executionResults = await axios.post('/api/compile', files)
   }
 
-  return executionResults
+  const { data } = executionResults
+  return data
 }
 
 export function modifyCode(code: string, errors: string[]): string {

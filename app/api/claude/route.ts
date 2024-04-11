@@ -51,7 +51,28 @@ export async function POST(request: Request) {
       messages: prompt.messages,
     })
 
-    // // Extract the suggested code from the response
+    // const response = {
+    //   id: 'msg_018ekvLsZ4TbEsA9g1TLqHnN',
+    //   type: 'message',
+    //   role: 'assistant',
+    //   content: [
+    //     {
+    //       type: 'text',
+    //       text: "Here are two React components where one imports the other and uses a custom hook to retrieve data:\n\n//FILENAME: useUserData.ts\n```typescript\nimport { useState, useEffect } from 'react';\n\ntype User = {\n  id: number;\n  name: string;\n  email: string;\n};\n\nconst useUserData = () => {\n  const [users, setUsers] = useState<User[]>([]);\n\n  useEffect(() => {\n    const fetchUsers = async () => {\n      try {\n        const response = await fetch('https://jsonplaceholder.typicode.com/users');\n        const data = await response.json();\n        setUsers(data);\n      } catch (error) {\n        console.error('Error fetching users:', error);\n      }\n    };\n\n    fetchUsers();\n  }, []);\n\n  return users;\n};\n\nexport default useUserData;\n```\n\n//FILENAME: UserList.tsx\n```tsx\nimport { FC } from 'react';\nimport useUserData from './useUserData';\n\nconst UserList2: FC = () => {\n  const users = useUserData();\n\n  return (\n    <div>\n      <h2>User List</h2>\n      {users.map((user) => (\n        <div key={user.id}>\n          <p>Name: {user.name}</p>\n          <p>Email: {user.email}</p>\n        </div>\n      ))}\n    </div>\n  );\n};\n\nexport default UserList;\n```\n\n//FILENAME: App.tsx\n```tsx\nimport UserList from './UserList';\n\nconst App = () => {\n  return (\n    <div>\n      <h1>My App</h1>\n      <UserList />\n    </div>\n  );\n};\n\nexport default App;\n```\n\nIn this example, we have three files:\n\n1. `useUserData.ts`: This file defines a custom hook called `useUserData` that fetches user data from an API endpoint using the `fetch` function. It uses the `useState` and `useEffect` hooks to manage the state of the fetched data. The `useUserData` hook returns the `users` state variable.\n\n2. `UserList.tsx`: This component imports the `useUserData` hook and uses it to retrieve the user data. It renders a list of user names and emails by mapping over the `users` array.\n\n3. `App.tsx`: This is the main component that renders the `UserList` component.\n\nThe `App` component imports the `UserList` component, and the `UserList` component, in turn, imports and uses the `useUserData` custom hook to fetch and display the user data.\n\nThis example demonstrates how to structure components, use custom hooks for data retrieval, and import dependencies between components.",
+    //     },
+    //   ],
+    //   model: 'claude-3-opus-20240229',
+    //   stop_reason: 'end_turn',
+    //   stop_sequence: null,
+    //   usage: {
+    //     input_tokens: 401,
+    //     output_tokens: 652,
+    //   },
+    // }
+
+    //console.log(JSON.stringify(response, null, 2))
+
+    // // // Extract the suggested code from the response
     const suggestedCode = response.content.slice(-1)[0].text
 
     // Add the assistant's response to the conversation history

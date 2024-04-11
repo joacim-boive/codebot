@@ -4,6 +4,7 @@ import { spawnSync } from 'child_process'
 import { join } from 'path'
 import { writeFileSync, unlinkSync, mkdirSync, existsSync } from 'fs'
 import { NextResponse } from 'next/server'
+import { copyTsconfig } from '@/app/api/compile/utils/copy-tsconfig'
 
 interface ExecError extends Error {
   stderr: Buffer
@@ -28,11 +29,17 @@ export async function POST(req: Request) {
     mkdirSync(tempDirPath)
   }
 
+  //This isn't async
+  copyTsconfig()
+
   // Write the code to a temporary file in the temp directory
   for (const file of files) {
     const { filename, code } = file
     const tempFilePath = join(tempDirPath, filename)
     writeFileSync(tempFilePath, code)
+
+    console.log(`Wrote ${filename} to ${tempFilePath}`)
+    console.log(`Code: ${code}`)
   }
 
   const errors: Errors[] = []
@@ -78,7 +85,8 @@ export async function POST(req: Request) {
     // Run ESlint on all the files in the tempDirPath
 
     //TODO - Run yarn run eslint --fix first on the files to remove formatting errors.
-    const eslintResult = spawnSync('yarn', ['eslint', tempDirPath], {
+
+    const eslintResult = spawnSync('npx', ['eslint', tempDirPath], {
       encoding: 'utf8',
     })
 
@@ -99,13 +107,9 @@ export async function POST(req: Request) {
   // Clean up the temporary file
   //unlinkSync(tempFilePath)
 
-  const result = { errors }
-
-  if (errors.length > 0) {
-    result.errors = errors
-  }
+  console.log(JSON.stringify(errors), null, 2)
 
   return NextResponse.json({
-    result,
+    errors,
   })
 }
