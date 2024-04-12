@@ -76,7 +76,8 @@ export default function Home() {
     }
   }, [messages])
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
     setIsLoading(true)
 
     // Add user's input to the messages
