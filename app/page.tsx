@@ -32,6 +32,7 @@ export default function Home() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        //e.preventDefault()
         handleSubmit()
       }
     }
@@ -39,7 +40,7 @@ export default function Home() {
     window.addEventListener('keydown', handleKeyDown)
 
     return () => window.removeEventListener('keydown', handleKeyDown) // Clean up
-  }, [])
+  }, [userInput])
 
   useEffect(() => {
     setIsLoading(true)
@@ -163,6 +164,7 @@ export default function Home() {
           />
 
           <h1 className="text-4xl font-bold animate-pulse">Codebot 0.1</h1>
+          <h2>{userInput}</h2>
         </div>
         <Card className="mb-10 border-0 shadow-none">
           <div className="space-y-4">
@@ -222,7 +224,7 @@ export default function Home() {
         </Card>
         <form
           ref={containerRef}
-          onSubmit={handleSubmit}
+          onSubmit={(e) => e.preventDefault()}
           className="flex flex-col items-center w-full"
         >
           <Textarea
@@ -232,7 +234,12 @@ export default function Home() {
             placeholder="Please submit your request for greatness here"
             className="w-full mb-2"
           />
-          <Button type="submit" className="w-full">
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            size="lg"
+            className="w-full"
+          >
             Send
           </Button>
         </form>
