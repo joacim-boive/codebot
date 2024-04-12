@@ -1,0 +1,8 @@
+node_modules/*
+dist/*
+.vscode/*
+.next/*
+.git/*
+.eslintrc.js
+postcss.config.js
+.prettierrc

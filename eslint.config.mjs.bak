@@ -1,0 +1,16 @@
+import eslintRecommended from '@eslint/eslintrc/lib/configs/recommended'
+import reactRecommended from 'eslint-plugin-react'
+import typescriptRecommended from '@typescript-eslint/eslint-plugin'
+import prettierRecommended from 'eslint-config-prettier'
+
+export default [
+  eslintRecommended,
+  reactRecommended.configs.recommended,
+  typescriptRecommended.configs.recommended,
+  prettierRecommended,
+  {
+    rules: {
+      'prettier/prettier': 'error',
+    },
+  },
+]
