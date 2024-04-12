@@ -6,6 +6,8 @@ import { writeFileSync, unlinkSync, mkdirSync, existsSync } from 'fs'
 import { NextResponse } from 'next/server'
 import { copyTsconfig } from '@/app/api/compile/utils/copy-tsconfig'
 import { filterErrors } from './utils/filter-errors'
+import { NextApiResponseWithSocket } from '@/types/socket'
+import { io } from '@/app/api/socket/route'
 
 interface ExecError extends Error {
   stderr: Buffer
@@ -19,7 +21,7 @@ type Errors = {
   systemError?: string
 }
 
-export async function POST(req: Request) {
+export async function POST(req: Request, res: NextApiResponseWithSocket) {
   const files = await req.json()
 
   // Get the path to the temp directory in your project
@@ -38,6 +40,8 @@ export async function POST(req: Request) {
     const { filename, code } = file
     const tempFilePath = join(tempDirPath, filename)
     writeFileSync(tempFilePath, code)
+
+    io.emit('message', `writing file: ${filename}`)
 
     console.log(`Wrote ${filename} to ${tempFilePath}`)
     console.log(`Code: ${code}`)

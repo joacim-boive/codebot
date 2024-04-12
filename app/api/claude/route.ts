@@ -14,7 +14,7 @@ const {
 } = process.env
 const client = new Anthropic()
 
-export async function POST(request: Request) {
+export const POST = async (request: Request) => {
   const { message, conversationId = 1 } = await request.json()
 
   try {

@@ -15,6 +15,7 @@ import Markdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { a11yDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Message } from '@/types/messages'
+import { socketClient } from './utils/socket'
 
 const messageVariants = {
   initial: { height: 0, opacity: 0 },
@@ -28,6 +29,14 @@ export default function Home() {
 
   const containerRef = useRef<HTMLFormElement>(null)
   const conversationId = 1 //TODO handle multiple conversations
+
+  useEffect(() => {
+    const socket = socketClient()
+
+    socket.on('message', (message) => {
+      console.log('message from server: ', message)
+    })
+  }, [])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
