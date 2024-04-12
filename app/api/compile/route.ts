@@ -5,6 +5,7 @@ import { join } from 'path'
 import { writeFileSync, unlinkSync, mkdirSync, existsSync } from 'fs'
 import { NextResponse } from 'next/server'
 import { copyTsconfig } from '@/app/api/compile/utils/copy-tsconfig'
+import { filterErrors } from './utils/filter-errors'
 
 interface ExecError extends Error {
   stderr: Buffer
@@ -66,9 +67,13 @@ export async function POST(req: Request) {
     const execError = error as ExecError
 
     if (execError.status !== 0) {
+      // Function to filter TS2307 errors
+      const filteredErrors = filterErrors(
+        (execError.output as Buffer[])[1].toString(),
+      )
       errors.push({
         type: 'TYPESCRIPT',
-        error: (execError.output as Buffer[])[1].toString(),
+        error: filteredErrors,
       })
     } else {
       console.error(`typescript error: ${error}`)

@@ -3,7 +3,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
-import { executeCode, modifyCode } from './utils/codeExecutor'
+import { executeCode } from './utils/codeExecutor'
 import { Textarea } from '@/components/ui/textarea'
 
 import { Button } from '@/components/ui/button'
@@ -28,6 +28,18 @@ export default function Home() {
 
   const containerRef = useRef<HTMLFormElement>(null)
   const conversationId = 1 //TODO handle multiple conversations
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        handleSubmit()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => window.removeEventListener('keydown', handleKeyDown) // Clean up
+  }, [])
 
   useEffect(() => {
     setIsLoading(true)
@@ -64,8 +76,7 @@ export default function Home() {
     }
   }, [messages])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async () => {
     setIsLoading(true)
 
     // Add user's input to the messages
@@ -153,7 +164,7 @@ export default function Home() {
 
           <h1 className="text-4xl font-bold animate-pulse">Codebot 0.1</h1>
         </div>
-        <Card className="mb-12 border-0 shadow-none">
+        <Card className="mb-10 border-0 shadow-none">
           <div className="space-y-4">
             {messages.map((message, index) => (
               <motion.div
@@ -170,7 +181,7 @@ export default function Home() {
                   message.role === 'user' ? 'justify-start pt-5' : 'justify-end'
                 }`}
               >
-                <div
+                <pre
                   className={`px-4 py-2 shadow-md rounded-lg max-w-[95%] ${
                     message.role === 'user'
                       ? 'bg-blue-500 text-white'
@@ -200,7 +211,7 @@ export default function Home() {
                       },
                     }}
                   />
-                </div>
+                </pre>
               </motion.div>
             ))}
 
@@ -212,15 +223,18 @@ export default function Home() {
         <form
           ref={containerRef}
           onSubmit={handleSubmit}
-          className="flex space-x-2"
+          className="flex flex-col items-center w-full"
         >
           <Textarea
+            required
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
-            placeholder="Enter your code snippet"
-            className="flex-grow"
+            placeholder="Please submit your request for greatness here"
+            className="w-full mb-2"
           />
-          <Button type="submit">Send</Button>
+          <Button type="submit" className="w-full">
+            Send
+          </Button>
         </form>
       </div>
     </>
