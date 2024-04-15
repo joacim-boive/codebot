@@ -4,12 +4,10 @@
 
 // This is because the AI might suggest modules that we haven't imported into our project and that's not an error per say.
 
-export const filterTS2307 = (errorString: string) => {
-  const errors = errorString.split('\n') // Split into array of individual errors
-
-  const filteredErrors = errors.filter(
+export const filterTS2307 = (errorArray: string[]) => {
+  const filteredErrors = errorArray.filter(
     (error) => error && !error.includes('TS2307'),
   )
 
-  return filteredErrors.join('\n') // Combine back into a string
+  return filteredErrors
 }
