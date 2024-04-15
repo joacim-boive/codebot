@@ -19,21 +19,61 @@ type Errors = {
   systemError?: string
 }
 
-export async function POST(req: Request) {
-  const files = await req.json()
+type CompilerConfig = {
+  errors: Errors[]
+  type: 'TYPESCRIPT' | 'ESLINT'
+  tempDirPath: string
+}
 
-  // Get the path to the temp directory in your project
+const compile = ({ type, errors, tempDirPath }: CompilerConfig) => {
+  const command = {
+    TYPESCRIPT: 'tsc',
+    ESLINT: 'eslint',
+  }
+
+  try {
+    const result = spawnSync('npx', [command[type]], {
+      cwd: tempDirPath, // Set the current working directory to tempDirPath
+      encoding: 'utf8', // Set the encoding to 'utf8' to handle output as a string
+    })
+
+    if (result.status !== 0) {
+      const filteredErrors = filterErrors(
+        (result.output as unknown as Buffer[])[1].toString(),
+      )
+
+      if (filteredErrors.length > 0) {
+        errors.push({
+          type,
+          error: filteredErrors,
+        })
+      }
+    }
+  } catch (error) {
+    console.error(`${type} error: ${error}`)
+    errors.push({
+      type,
+      systemError: (error as ExecError).stderr.toString(),
+    })
+  }
+
+  return errors
+}
+
+export async function POST(req: Request) {
   const tempDirPath = join(process.cwd(), 'temp')
+  const files = await req.json()
+  const errors: Errors[] = []
+
+  //This isn't async
+  copyTsconfig()
 
   // Create the temp directory if it doesn't exist
   if (!existsSync(tempDirPath)) {
     mkdirSync(tempDirPath)
   }
 
-  //This isn't async
-  copyTsconfig()
-
-  // Write the code to a temporary file in the temp directory
+  // Write the code to temporary file(s) in the temp directory
   for (const file of files) {
     const { filename, code } = file
     const tempFilePath = join(tempDirPath, filename)
@@ -43,8 +83,7 @@ export async function POST(req: Request) {
     console.log(`Code: ${code}`)
   }
 
-  const errors: Errors[] = []
-
+  // First we need to run prettier on all files to avoid prettier linting errors - where possible.
   try {
     execSync('npx prettier --write .', { cwd: './temp' })
   } catch (error) {
@@ -60,59 +99,22 @@ export async function POST(req: Request) {
     console.error(`execSync error: ${error}`)
   }
 
-  try {
-    const stdout = execSync('npx tsc', { cwd: './temp' })
-    console.log(`stdout: ${stdout.toString()}`)
-  } catch (error) {
-    const execError = error as ExecError
+  compile({
+    type: 'TYPESCRIPT',
+    errors,
+    tempDirPath,
+  })
 
-    if (execError.status !== 0) {
-      // Function to filter TS2307 errors
-      const filteredErrors = filterErrors(
-        (execError.output as Buffer[])[1].toString(),
-      )
-      errors.push({
-        type: 'TYPESCRIPT',
-        error: filteredErrors,
-      })
-    } else {
-      console.error(`typescript error: ${error}`)
-      errors.push({
-        type: 'TYPESCRIPT',
-        systemError: (error as ExecError).stderr.toString(),
-      })
-    }
-
-    console.error(`execSync error: ${error}`)
-  }
-
-  try {
-    // Run ESlint on all the files in the tempDirPath
-
-    //TODO - Run yarn run eslint --fix first on the files to remove formatting errors.
-
-    const eslintResult = spawnSync('npx', ['eslint', tempDirPath], {
-      encoding: 'utf8',
-    })
-
-    if (eslintResult.status !== 0) {
-      errors.push({
-        type: 'ESLINT',
-        error: (eslintResult.output as unknown as Buffer[])[1].toString(),
-      })
-    }
-  } catch (error) {
-    console.error(`eslint error: ${error}`)
-    errors.push({
-      type: 'ESLINT',
-      systemError: (error as ExecError).stderr.toString(),
-    })
-  }
+  compile({
+    type: 'ESLINT',
+    errors,
+    tempDirPath,
+  })
 
   // Clean up the temporary file
   //unlinkSync(tempFilePath)
 
-  console.log(JSON.stringify(errors), null, 2)
+  console.log(JSON.stringify(errors, null, 2))
 
   return NextResponse.json({
     errors,

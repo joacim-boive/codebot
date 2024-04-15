@@ -32,14 +32,18 @@ export default function Home() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        handleSubmit()
+        const formEvent = new Event('submit', {
+          bubbles: true,
+          cancelable: true,
+        })
+        handleSubmit(formEvent)
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
 
     return () => window.removeEventListener('keydown', handleKeyDown) // Clean up
-  }, [])
+  }, [userInput])
 
   useEffect(() => {
     setIsLoading(true)
@@ -76,7 +80,8 @@ export default function Home() {
     }
   }, [messages])
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent | Event) => {
+    e?.preventDefault()
     setIsLoading(true)
 
     // Add user's input to the messages
