@@ -16,10 +16,20 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { a11yDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Message } from '@/types/messages'
 import io, { Socket } from 'socket.io-client'
+import {
+  CLIENT_SUBMIT_QUESTION,
+  SERVER_RETURN_QUESTION_ANSWER,
+} from '@/lib/eventNames'
+import { useToast } from '@/components/ui/use-toast'
 
 const messageVariants = {
   initial: { height: 0, opacity: 0 },
   animate: { height: 'auto', opacity: 1 },
+}
+
+type SocketEvent = {
+  messageType: typeof CLIENT_SUBMIT_QUESTION
+  content: string
 }
 
 export default function Home() {
@@ -31,6 +41,7 @@ export default function Home() {
   const containerRef = useRef<HTMLFormElement>(null)
   const conversationId = 1 //TODO handle multiple conversations
   const socketRef = useRef<Socket | null>(null)
+  const { toast } = useToast()
 
   useEffect(() => {
     socketInitializer()
@@ -43,6 +54,7 @@ export default function Home() {
   }, [])
 
   const socketInitializer = async () => {
+    //Trigger the start of socker server
     await fetch('/api/socketio')
 
     socketRef.current = io('http://localhost:3001', {
@@ -50,18 +62,69 @@ export default function Home() {
       transports: ['websocket'], // Force WebSocket
     })
 
-    socketRef.current.on('connect', () => {
-      setIsConnected(true)
+    socketRef.current.on('welcome', () => {
+      toast({ variant: 'default', description: 'Socket connected' })
     })
 
-    socketRef.current.on('welcome', (data: unknown) => {
-      console.log(data)
+    socketRef.current.on(SERVER_RETURN_QUESTION_ANSWER, (data: Message) => {
+      setMessages((prevMessages) => [...prevMessages, data])
+      setIsLoading(false)
+
+      // const { suggestedCode } = response.data
+
+      // // Execute the suggested code and validate the output
+      // let data = await executeCode(suggestedCode)
+      // let retries = 0
+
+      // if ((data?.errors ?? []).length > 0) {
+      //   setMessages((prevMessages) => [
+      //     ...prevMessages,
+      //     {
+      //       role: 'assistant',
+      //       content: `Seems as my code wasn't entirely up to standards - trying again...`,
+      //     },
+      //   ])
+      // }
+
+      // let retryResponse
+      // while ((data?.errors ?? []).length > 0 && retries < 3) {
+      //   retries++
+
+      //   setMessages((prevMessages) => [
+      //     ...prevMessages,
+      //     {
+      //       role: 'assistant',
+      //       content: data.errors?.map((error) => error.error)?.join(', ') ?? '',
+      //     },
+      //   ])
+
+      //   retryResponse = await axios.post<{ suggestedCode: string }>(
+      //     '/api/claude',
+      //     {
+      //       message: `There was an issue with your code suggestion. Please try and write valid code this time without any errors. Attempt ${retries}/3: ${data.errors?.map((error) => error.error)?.join(', ') ?? ''}`,
+      //     },
+      //   )
+      //   const { suggestedCode } = retryResponse.data
+
+      //   // Execute the suggested code and validate the output
+      //   data = await executeCode(suggestedCode)
+      // }
+
+      // // Add the validated code to the messages
+      // setMessages((prevMessages) => [
+      //   ...prevMessages,
+      //   { role: 'assistant', content: suggestedCode },
+      // ])
+
+      // // Clear the user input
+      // setUserInput('')
+      // setIsLoading(false)
     })
   }
 
-  const sendEvent = () => {
+  const sendEvent = ({ messageType, content }: SocketEvent) => {
     if (socketRef.current) {
-      socketRef.current.emit('eventName', { data: 'Hello from client' })
+      socketRef.current.emit(messageType, { content })
     }
   }
 
@@ -126,60 +189,10 @@ export default function Home() {
       { role: 'user', content: userInput },
     ])
 
-    // Send the user's input to the Claude API
-    const response = await axios.post<{ suggestedCode: string }>(
-      '/api/claude',
-      { message: userInput },
-    )
-    const { suggestedCode } = response.data
-
-    // Execute the suggested code and validate the output
-    let data = await executeCode(suggestedCode)
-    let retries = 0
-
-    if ((data?.errors ?? []).length > 0) {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          role: 'assistant',
-          content: `Seems as my code wasn't entirely up to standards - trying again...`,
-        },
-      ])
-    }
-
-    let retryResponse
-    while ((data?.errors ?? []).length > 0 && retries < 3) {
-      retries++
-
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          role: 'assistant',
-          content: data.errors?.map((error) => error.error)?.join(', ') ?? '',
-        },
-      ])
-
-      retryResponse = await axios.post<{ suggestedCode: string }>(
-        '/api/claude',
-        {
-          message: `There was an issue with your code suggestion. Please try and write valid code this time without any errors. Attempt ${retries}/3: ${data.errors?.map((error) => error.error)?.join(', ') ?? ''}`,
-        },
-      )
-      const { suggestedCode } = retryResponse.data
-
-      // Execute the suggested code and validate the output
-      data = await executeCode(suggestedCode)
-    }
-
-    // Add the validated code to the messages
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { role: 'assistant', content: suggestedCode },
-    ])
-
-    // Clear the user input
-    setUserInput('')
-    setIsLoading(false)
+    sendEvent({
+      messageType: CLIENT_SUBMIT_QUESTION,
+      content: userInput,
+    })
   }
 
   return (
@@ -208,7 +221,17 @@ export default function Home() {
         <p>
           Socket connection status: {isConnected ? 'Connected' : 'Disconnected'}
         </p>
-        <button onClick={sendEvent}>Send Event</button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            toast({
+              title: 'Uh oh! Something went wrong.',
+              description: 'There was a problem with your request.',
+            })
+          }}
+        >
+          Show Toast
+        </Button>
         <Card className="mb-10 border-0 shadow-none">
           <div className="space-y-4">
             {messages.map((message, index) => (
