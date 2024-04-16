@@ -45,7 +45,10 @@ export default function Home() {
   const socketInitializer = async () => {
     await fetch('/api/socketio')
 
-    socketRef.current = io('http://localhost:3001')
+    socketRef.current = io('http://localhost:3001', {
+      path: '/api/socketio',
+      transports: ['websocket'], // Force WebSocket
+    })
 
     socketRef.current.on('connect', () => {
       setIsConnected(true)

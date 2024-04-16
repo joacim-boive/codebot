@@ -8,6 +8,7 @@ export default function SocketHandler() {
   if (!io) {
     io = new Server({
       addTrailingSlash: false,
+      path: '/api/socketio',
       cors: {
         origin: 'http://localhost:3000', // Allow your Next.js frontend's origin
         methods: ['GET', 'POST'],
