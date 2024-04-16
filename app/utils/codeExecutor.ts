@@ -32,10 +32,3 @@ export async function executeCode(code: string) {
   const { data } = executionResults
   return data
 }
-
-export function modifyCode(code: string, errors: string[]): string {
-  // Analyze the errors and modify the code accordingly
-  // Return the modified code
-  // Placeholder implementation
-  return code
-}

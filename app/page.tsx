@@ -15,6 +15,7 @@ import Markdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { a11yDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Message } from '@/types/messages'
+import io, { Socket } from 'socket.io-client'
 
 const messageVariants = {
   initial: { height: 0, opacity: 0 },
@@ -25,9 +26,41 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([])
   const [userInput, setUserInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isConnected, setIsConnected] = useState(false)
 
   const containerRef = useRef<HTMLFormElement>(null)
   const conversationId = 1 //TODO handle multiple conversations
+  const socketRef = useRef<Socket | null>(null)
+
+  useEffect(() => {
+    socketInitializer()
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect()
+      }
+    }
+  }, [])
+
+  const socketInitializer = async () => {
+    await fetch('/api/socketio')
+
+    socketRef.current = io('http://localhost:3001')
+
+    socketRef.current.on('connect', () => {
+      setIsConnected(true)
+    })
+
+    socketRef.current.on('welcome', (data: unknown) => {
+      console.log(data)
+    })
+  }
+
+  const sendEvent = () => {
+    if (socketRef.current) {
+      socketRef.current.emit('eventName', { data: 'Hello from client' })
+    }
+  }
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -169,6 +202,10 @@ export default function Home() {
 
           <h1 className="text-4xl font-bold animate-pulse">Codebot 0.1</h1>
         </div>
+        <p>
+          Socket connection status: {isConnected ? 'Connected' : 'Disconnected'}
+        </p>
+        <button onClick={sendEvent}>Send Event</button>
         <Card className="mb-10 border-0 shadow-none">
           <div className="space-y-4">
             {messages.map((message, index) => (
