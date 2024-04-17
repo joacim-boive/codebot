@@ -6,13 +6,12 @@ import {
 } from '@/lib/eventNames'
 import { setupDatabase } from '@/app/database'
 import { queryAi } from '@/lib/queryAi'
+import { Message } from '@/types/messages'
 
 type AllowedEvents = 'welcome' | typeof SERVER_RETURN_QUESTION_ANSWER
 
-type Response = {
+type Response = Message & {
   role: 'assistant'
-  content: string
-  variant?: 'default' | 'info' | 'warning' | 'error'
 }
 
 type SocketEvent = {
@@ -47,7 +46,7 @@ export default function SocketHandler() {
       emitEvent({
         socket,
         event: 'welcome',
-        response: { role: 'assistant', content: 'Welcome' },
+        response: { role: 'assistant', content: 'Welcome', variant: 'info' },
       })
 
       socket.on('disconnect', async () => {
@@ -86,10 +85,9 @@ export default function SocketHandler() {
           response: {
             content: data,
             role: 'assistant',
+            variant: 'success',
           },
         })
-
-        //socket.broadcast.emit(SERVER_RETURN_QUESTION_ANSWER, data)
       })
     })
   }

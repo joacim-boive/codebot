@@ -36,7 +36,7 @@ export const queryAi = async ({ content, conversationId = 1 }: Prompt) => {
     })
 
     //Add the new message
-    conversationHistory.push({ role: 'user', content })
+    conversationHistory.push({ role: 'user', content, variant: 'info' })
 
     console.log(JSON.stringify(conversationHistory, null, 2))
     // Create a chat prompt with the entire conversation history

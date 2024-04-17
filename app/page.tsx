@@ -32,6 +32,20 @@ type SocketEvent = {
   content: string
 }
 
+type VariantColors = {
+  bg: string
+  text: string
+}
+
+const variantColorMapping: Record<
+  NonNullable<Message['variant']>,
+  VariantColors
+> = {
+  info: { bg: 'bg-green-200', text: 'text-green-800' },
+  error: { bg: 'bg-red-200', text: 'text-red-800' },
+  success: { bg: 'bg-gray-200', text: 'text-gray-800' },
+}
+
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([])
   const [userInput, setUserInput] = useState('')
@@ -44,7 +58,13 @@ export default function Home() {
   const { toast } = useToast()
 
   useEffect(() => {
-    socketInitializer()
+    const initializeSocket = async () => {
+      if (!socketRef.current) {
+        await socketInitializer()
+      }
+    }
+
+    initializeSocket()
 
     return () => {
       if (socketRef.current) {
@@ -63,6 +83,7 @@ export default function Home() {
     })
 
     socketRef.current.on('welcome', () => {
+      setIsConnected(true)
       toast({ variant: 'default', description: 'Socket connected' })
     })
 
@@ -186,7 +207,7 @@ export default function Home() {
     // Add user's input to the messages
     setMessages((prevMessages) => [
       ...prevMessages,
-      { role: 'user', content: userInput },
+      { role: 'user', content: userInput, variant: 'info' },
     ])
 
     sendEvent({
@@ -194,6 +215,8 @@ export default function Home() {
       content: userInput,
     })
   }
+
+  let colorClasses
 
   return (
     <>
@@ -234,54 +257,58 @@ export default function Home() {
         </Button>
         <Card className="mb-10 border-0 shadow-none">
           <div className="space-y-4">
-            {messages.map((message, index) => (
-              <motion.div
-                key={index}
-                layout
-                initial="initial"
-                animate="animate"
-                variants={messageVariants}
-                transition={{
-                  opacity: { duration: 0.5 },
-                  scale: { duration: 0.5, ease: [0.4, 0, 0.2, 1] },
-                }}
-                className={`flex ${
-                  message.role === 'user' ? 'justify-start pt-5' : 'justify-end'
-                }`}
-              >
-                <pre
-                  className={`px-4 py-2 shadow-md rounded-lg max-w-[95%] ${
-                    message.role === 'user'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-800'
-                  } ${message.role === 'assistant' ? 'ml-4' : ''}`}
+            {messages.map((message, index) => {
+              colorClasses = variantColorMapping[message.variant] || {
+                bg: 'bg-gray-200',
+                text: 'text-gray-800',
+              }
+              return (
+                <motion.div
+                  key={index}
+                  layout
+                  initial="initial"
+                  animate="animate"
+                  variants={messageVariants}
+                  transition={{
+                    opacity: { duration: 0.5 },
+                    scale: { duration: 0.5, ease: [0.4, 0, 0.2, 1] },
+                  }}
+                  className={`flex ${message.role === 'user' ? 'justify-start pt-5' : 'justify-end'}`}
                 >
-                  <Markdown
-                    // eslint-disable-next-line react/no-children-prop
-                    children={message.content}
-                    components={{
-                      code(props) {
-                        const { children, className, ...rest } = props
-                        const match = /language-(\w+)/.exec(className || '')
-                        return match ? (
-                          <SyntaxHighlighter
-                            {...rest}
-                            PreTag="div"
-                            children={String(children).replace(/\n$/, '')}
-                            language={match[1]}
-                            style={a11yDark}
-                          />
-                        ) : (
-                          <code {...rest} className={className}>
-                            {children}
-                          </code>
-                        )
-                      },
-                    }}
-                  />
-                </pre>
-              </motion.div>
-            ))}
+                  <pre
+                    className={`px-4 py-2 shadow-md rounded-lg max-w-[95%] ${
+                      message.role === 'user'
+                        ? 'bg-blue-500 text-white'
+                        : `${colorClasses.bg} ${colorClasses.text}`
+                    } ${message.role === 'assistant' ? 'ml-4' : ''}`}
+                  >
+                    <Markdown
+                      // eslint-disable-next-line react/no-children-prop
+                      children={message.content}
+                      components={{
+                        code(props) {
+                          const { children, className, ...rest } = props
+                          const match = /language-(\w+)/.exec(className || '')
+                          return match ? (
+                            <SyntaxHighlighter
+                              {...rest}
+                              PreTag="div"
+                              children={String(children).replace(/\n$/, '')}
+                              language={match[1]}
+                              style={a11yDark}
+                            />
+                          ) : (
+                            <code {...rest} className={className}>
+                              {children}
+                            </code>
+                          )
+                        },
+                      }}
+                    />
+                  </pre>
+                </motion.div>
+              )
+            })}
 
             <div className="flex justify-center items-end flex-grow">
               <PropagateLoader loading={isLoading} color="#556365" />
