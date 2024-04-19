@@ -3,7 +3,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
-import { executeCode } from './utils/codeExecutor'
 import { Textarea } from '@/components/ui/textarea'
 
 import { Button } from '@/components/ui/button'
@@ -18,8 +17,10 @@ import { Message } from '@/types/messages'
 import io, { Socket } from 'socket.io-client'
 import {
   CLIENT_SUBMIT_QUESTION,
+  SERVER_COMPILE_PROGRESS,
+  SERVER_ERROR,
   SERVER_RETURN_QUESTION_ANSWER,
-} from '@/lib/eventNames'
+} from '@/lib/event-names'
 import { useToast } from '@/components/ui/use-toast'
 
 const messageVariants = {
@@ -75,11 +76,26 @@ export default function Home() {
 
   const socketInitializer = async () => {
     //Trigger the start of socker server
-    await fetch('/api/socketio')
+    try {
+      await fetch('/api/socketio')
+    } catch (error) {
+      console.error('Error initializing socket:', error)
+      toast({
+        title: 'Error initializing socket',
+        description: 'Please try again later',
+        variant: 'destructive',
+        duration: 5000,
+      })
+      return
+    }
 
     socketRef.current = io('http://localhost:3001', {
       path: '/api/socketio',
       transports: ['websocket'], // Force WebSocket
+    })
+
+    socketRef.current.onAny((event, ...args) => {
+      console.log(event, args)
     })
 
     socketRef.current.on('welcome', () => {
@@ -89,57 +105,24 @@ export default function Home() {
 
     socketRef.current.on(SERVER_RETURN_QUESTION_ANSWER, (data: Message) => {
       setMessages((prevMessages) => [...prevMessages, data])
+
+      setIsLoading(!!data.isPending)
+      setUserInput('')
+    })
+
+    socketRef.current.on(SERVER_COMPILE_PROGRESS, (data: Message) => {
+      setMessages((prevMessages) => [...prevMessages, data])
+    })
+
+    socketRef.current.on(SERVER_ERROR, (data: Message) => {
+      setMessages((prevMessages) => [...prevMessages, data])
       setIsLoading(false)
-
-      // const { suggestedCode } = response.data
-
-      // // Execute the suggested code and validate the output
-      // let data = await executeCode(suggestedCode)
-      // let retries = 0
-
-      // if ((data?.errors ?? []).length > 0) {
-      //   setMessages((prevMessages) => [
-      //     ...prevMessages,
-      //     {
-      //       role: 'assistant',
-      //       content: `Seems as my code wasn't entirely up to standards - trying again...`,
-      //     },
-      //   ])
-      // }
-
-      // let retryResponse
-      // while ((data?.errors ?? []).length > 0 && retries < 3) {
-      //   retries++
-
-      //   setMessages((prevMessages) => [
-      //     ...prevMessages,
-      //     {
-      //       role: 'assistant',
-      //       content: data.errors?.map((error) => error.error)?.join(', ') ?? '',
-      //     },
-      //   ])
-
-      //   retryResponse = await axios.post<{ suggestedCode: string }>(
-      //     '/api/claude',
-      //     {
-      //       message: `There was an issue with your code suggestion. Please try and write valid code this time without any errors. Attempt ${retries}/3: ${data.errors?.map((error) => error.error)?.join(', ') ?? ''}`,
-      //     },
-      //   )
-      //   const { suggestedCode } = retryResponse.data
-
-      //   // Execute the suggested code and validate the output
-      //   data = await executeCode(suggestedCode)
-      // }
-
-      // // Add the validated code to the messages
-      // setMessages((prevMessages) => [
-      //   ...prevMessages,
-      //   { role: 'assistant', content: suggestedCode },
-      // ])
-
-      // // Clear the user input
-      // setUserInput('')
-      // setIsLoading(false)
+      toast({
+        title: 'Error',
+        description: data.content,
+        variant: 'destructive',
+        duration: 5000,
+      })
     })
   }
 
