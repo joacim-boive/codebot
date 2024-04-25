@@ -3,7 +3,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
-import { Textarea } from '@/components/ui/textarea'
+import { v4 as uuidv4 } from 'uuid'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -22,6 +22,8 @@ import {
   SERVER_RETURN_QUESTION_ANSWER,
 } from '@/lib/event-names'
 import { useToast } from '@/components/ui/use-toast'
+import { ChatInput } from '@/components/chat-input'
+import { LogItem, LogWidget } from '@/components/log-widget'
 
 const messageVariants = {
   initial: { height: 0, opacity: 0 },
@@ -49,7 +51,6 @@ const variantColorMapping: Record<
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([])
-  const [userInput, setUserInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
 
@@ -107,7 +108,6 @@ export default function Home() {
       setMessages((prevMessages) => [...prevMessages, data])
 
       setIsLoading(!!data.isPending)
-      setUserInput('')
     })
 
     socketRef.current.on(SERVER_COMPILE_PROGRESS, (data: Message) => {
@@ -131,22 +131,6 @@ export default function Home() {
       socketRef.current.emit(messageType, { content })
     }
   }
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        const formEvent = new Event('submit', {
-          bubbles: true,
-          cancelable: true,
-        })
-        handleSubmit(formEvent)
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-
-    return () => window.removeEventListener('keydown', handleKeyDown) // Clean up
-  }, [userInput])
 
   useEffect(() => {
     setIsLoading(true)
@@ -183,8 +167,7 @@ export default function Home() {
     }
   }, [messages])
 
-  const handleSubmit = async (e: React.FormEvent | Event) => {
-    e?.preventDefault()
+  const handleSubmit = async (userInput: string) => {
     setIsLoading(true)
 
     // Add user's input to the messages
@@ -298,22 +281,7 @@ export default function Home() {
             </div>
           </div>
         </Card>
-        <form
-          ref={containerRef}
-          onSubmit={handleSubmit}
-          className="flex flex-col items-center w-full"
-        >
-          <Textarea
-            required
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            placeholder="Please submit your request for greatness here"
-            className="w-full mb-2"
-          />
-          <Button type="submit" className="w-full">
-            Send
-          </Button>
-        </form>
+        <ChatInput onSubmit={handleSubmit} />
       </div>
     </>
   )
