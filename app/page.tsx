@@ -3,9 +3,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
-import { v4 as uuidv4 } from 'uuid'
 
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import Image from 'next/image'
 import { PropagateLoader } from 'react-spinners'
@@ -21,9 +19,7 @@ import {
   SERVER_ERROR,
   SERVER_RETURN_QUESTION_ANSWER,
 } from '@/lib/event-names'
-import { useToast } from '@/components/ui/use-toast'
 import { ChatInput } from '@/components/chat-input'
-import { LogItem, LogWidget } from '@/components/log-widget'
 
 const messageVariants = {
   initial: { height: 0, opacity: 0 },
@@ -57,7 +53,6 @@ export default function Home() {
   const containerRef = useRef<HTMLFormElement>(null)
   const conversationId = 1 //TODO handle multiple conversations
   const socketRef = useRef<Socket | null>(null)
-  const { toast } = useToast()
 
   useEffect(() => {
     const initializeSocket = async () => {
@@ -81,12 +76,7 @@ export default function Home() {
       await fetch('/api/socketio')
     } catch (error) {
       console.error('Error initializing socket:', error)
-      toast({
-        title: 'Error initializing socket',
-        description: 'Please try again later',
-        variant: 'destructive',
-        duration: 5000,
-      })
+
       return
     }
 
@@ -101,7 +91,6 @@ export default function Home() {
 
     socketRef.current.on('welcome', () => {
       setIsConnected(true)
-      toast({ variant: 'default', description: 'Socket connected' })
     })
 
     socketRef.current.on(SERVER_RETURN_QUESTION_ANSWER, (data: Message) => {
@@ -117,12 +106,6 @@ export default function Home() {
     socketRef.current.on(SERVER_ERROR, (data: Message) => {
       setMessages((prevMessages) => [...prevMessages, data])
       setIsLoading(false)
-      toast({
-        title: 'Error',
-        description: data.content,
-        variant: 'destructive',
-        duration: 5000,
-      })
     })
   }
 
@@ -210,17 +193,6 @@ export default function Home() {
         <p>
           Socket connection status: {isConnected ? 'Connected' : 'Disconnected'}
         </p>
-        <Button
-          variant="outline"
-          onClick={() => {
-            toast({
-              title: 'Uh oh! Something went wrong.',
-              description: 'There was a problem with your request.',
-            })
-          }}
-        >
-          Show Toast
-        </Button>
         <Card className="mb-10 border-0 shadow-none">
           <div className="space-y-4">
             {messages.map((message, index) => {

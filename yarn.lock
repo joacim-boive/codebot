@@ -350,24 +350,6 @@
   resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@pkgr/core/-/core-0.1.1.tgz#1ec17e2edbec25c8306d424ecfbf13c7de1aaa31"
   integrity sha1-HsF+LtvsJcgwbUJOz78Tx94aqjE=
 
-"@radix-ui/primitive@1.0.1":
-  version "1.0.1"
-  resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@radix-ui/primitive/-/primitive-1.0.1.tgz#e46f9958b35d10e9f6dc71c497305c22e3e55dbd"
-  integrity sha1-5G+ZWLNdEOn23HHElzBcIuPlXb0=
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-
-"@radix-ui/react-collection@1.0.3":
-  version "1.0.3"
-  resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@radix-ui/react-collection/-/react-collection-1.0.3.tgz#9595a66e09026187524a36c6e7e9c7d286469159"
-  integrity sha1-lZWmbgkCYYdSSjbG5+nH0oZGkVk=
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-    "@radix-ui/react-compose-refs" "1.0.1"
-    "@radix-ui/react-context" "1.0.1"
-    "@radix-ui/react-primitive" "1.0.3"
-    "@radix-ui/react-slot" "1.0.2"
-
 "@radix-ui/react-compose-refs@1.0.1":
   version "1.0.1"
   resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@radix-ui/react-compose-refs/-/react-compose-refs-1.0.1.tgz#7ed868b66946aa6030e580b1ffca386dd4d21989"
@@ -375,114 +357,13 @@
   dependencies:
     "@babel/runtime" "^7.13.10"
 
-"@radix-ui/react-context@1.0.1":
-  version "1.0.1"
-  resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@radix-ui/react-context/-/react-context-1.0.1.tgz#fe46e67c96b240de59187dcb7a1a50ce3e2ec00c"
-  integrity sha1-/kbmfJayQN5ZGH3LehpQzj4uwAw=
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-
-"@radix-ui/react-dismissable-layer@1.0.5":
-  version "1.0.5"
-  resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@radix-ui/react-dismissable-layer/-/react-dismissable-layer-1.0.5.tgz#3f98425b82b9068dfbab5db5fff3df6ebf48b9d4"
-  integrity sha1-P5hCW4K5Bo37q121//Pfbr9IudQ=
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-    "@radix-ui/primitive" "1.0.1"
-    "@radix-ui/react-compose-refs" "1.0.1"
-    "@radix-ui/react-primitive" "1.0.3"
-    "@radix-ui/react-use-callback-ref" "1.0.1"
-    "@radix-ui/react-use-escape-keydown" "1.0.3"
-
-"@radix-ui/react-portal@1.0.4":
-  version "1.0.4"
-  resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@radix-ui/react-portal/-/react-portal-1.0.4.tgz#df4bfd353db3b1e84e639e9c63a5f2565fb00e15"
-  integrity sha1-30v9NT2zsehOY56cY6XyVl+wDhU=
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-    "@radix-ui/react-primitive" "1.0.3"
-
-"@radix-ui/react-presence@1.0.1":
-  version "1.0.1"
-  resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@radix-ui/react-presence/-/react-presence-1.0.1.tgz#491990ba913b8e2a5db1b06b203cb24b5cdef9ba"
-  integrity sha1-SRmQupE7jipdsbBrIDyyS1ze+bo=
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-    "@radix-ui/react-compose-refs" "1.0.1"
-    "@radix-ui/react-use-layout-effect" "1.0.1"
-
-"@radix-ui/react-primitive@1.0.3":
-  version "1.0.3"
-  resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@radix-ui/react-primitive/-/react-primitive-1.0.3.tgz#d49ea0f3f0b2fe3ab1cb5667eb03e8b843b914d0"
-  integrity sha1-1J6g8/Cy/jqxy1Zn6wPouEO5FNA=
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-    "@radix-ui/react-slot" "1.0.2"
-
-"@radix-ui/react-slot@1.0.2", "@radix-ui/react-slot@^1.0.2":
+"@radix-ui/react-slot@^1.0.2":
   version "1.0.2"
   resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@radix-ui/react-slot/-/react-slot-1.0.2.tgz#a9ff4423eade67f501ffb32ec22064bc9d3099ab"
   integrity sha1-qf9EI+reZ/UB/7MuwiBkvJ0wmas=
   dependencies:
     "@babel/runtime" "^7.13.10"
     "@radix-ui/react-compose-refs" "1.0.1"
-
-"@radix-ui/react-toast@^1.1.5":
-  version "1.1.5"
-  resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@radix-ui/react-toast/-/react-toast-1.1.5.tgz#f5788761c0142a5ae9eb97f0051fd3c48106d9e6"
-  integrity sha1-9XiHYcAUKlrp65fwBR/TxIEG2eY=
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-    "@radix-ui/primitive" "1.0.1"
-    "@radix-ui/react-collection" "1.0.3"
-    "@radix-ui/react-compose-refs" "1.0.1"
-    "@radix-ui/react-context" "1.0.1"
-    "@radix-ui/react-dismissable-layer" "1.0.5"
-    "@radix-ui/react-portal" "1.0.4"
-    "@radix-ui/react-presence" "1.0.1"
-    "@radix-ui/react-primitive" "1.0.3"
-    "@radix-ui/react-use-callback-ref" "1.0.1"
-    "@radix-ui/react-use-controllable-state" "1.0.1"
-    "@radix-ui/react-use-layout-effect" "1.0.1"
-    "@radix-ui/react-visually-hidden" "1.0.3"
-
-"@radix-ui/react-use-callback-ref@1.0.1":
-  version "1.0.1"
-  resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@radix-ui/react-use-callback-ref/-/react-use-callback-ref-1.0.1.tgz#f4bb1f27f2023c984e6534317ebc411fc181107a"
-  integrity sha1-9LsfJ/ICPJhOZTQxfrxBH8GBEHo=
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-
-"@radix-ui/react-use-controllable-state@1.0.1":
-  version "1.0.1"
-  resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@radix-ui/react-use-controllable-state/-/react-use-controllable-state-1.0.1.tgz#ecd2ced34e6330caf89a82854aa2f77e07440286"
-  integrity sha1-7NLO005jMMr4moKFSqL3fgdEAoY=
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-    "@radix-ui/react-use-callback-ref" "1.0.1"
-
-"@radix-ui/react-use-escape-keydown@1.0.3":
-  version "1.0.3"
-  resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@radix-ui/react-use-escape-keydown/-/react-use-escape-keydown-1.0.3.tgz#217b840c250541609c66f67ed7bab2b733620755"
-  integrity sha1-IXuEDCUFQWCcZvZ+17qytzNiB1U=
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-    "@radix-ui/react-use-callback-ref" "1.0.1"
-
-"@radix-ui/react-use-layout-effect@1.0.1":
-  version "1.0.1"
-  resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@radix-ui/react-use-layout-effect/-/react-use-layout-effect-1.0.1.tgz#be8c7bc809b0c8934acf6657b577daf948a75399"
-  integrity sha1-vox7yAmwyJNKz2ZXtXfa+UinU5k=
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-
-"@radix-ui/react-visually-hidden@1.0.3":
-  version "1.0.3"
-  resolved "https://pkgs.dev.azure.com/carnegieinvestmentbank/_packaging/Carnegie/npm/registry/@radix-ui/react-visually-hidden/-/react-visually-hidden-1.0.3.tgz#51aed9dd0fe5abcad7dee2a234ad36106a6984ac"
-  integrity sha1-Ua7Z3Q/lq8rX3uKiNK02EGpphKw=
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-    "@radix-ui/react-primitive" "1.0.3"
 
 "@shadcn/ui@^0.0.4":
   version "0.0.4"
