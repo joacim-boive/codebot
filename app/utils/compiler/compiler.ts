@@ -10,10 +10,6 @@ import { emitEvent } from '@/lib/socket'
 import { SERVER_COMPILE_PROGRESS } from '@/lib/event-names'
 import { extractCodeFiles } from '../extract-code-files'
 
-interface ExecutionResult {
-  data: { errors?: { type: string; error: string }[] }
-}
-
 interface ExecError extends Error {
   stderr: Buffer
   output?: Buffer[]

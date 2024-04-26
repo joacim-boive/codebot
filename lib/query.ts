@@ -70,7 +70,7 @@ const getConversationHistory = async (
 }
 
 /**
- * Retrieves the AI response based on the current question and includes theconversation history for context. The result is stored in database with the corresponding conversation ID.
+ * Retrieves the AI response based on the current question and includes the conversation history for context. The result is stored in database with the corresponding conversation ID.
  *
  * @param {MessageAi[]} conversationHistory - The history of messages in the conversation.
  * @param {number} conversationId - The ID of the conversation.
