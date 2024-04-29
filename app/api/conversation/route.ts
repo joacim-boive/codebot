@@ -10,8 +10,7 @@ export async function POST(request: Request) {
     // Load the conversation history from the database
     const conversationHistory: Message[] = await db('conversations')
       .where({ conversationId })
-      .select('role', 'content')
-      .orderBy('timestamp')
+      .select('role', 'content', 'extra')
 
     return NextResponse.json({
       conversationHistory,
