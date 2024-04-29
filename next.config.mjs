@@ -3,7 +3,7 @@
 const nextConfig = {
   reactStrictMode: true,
   experimental: {
-    serverComponentsExternalPackages: ['knex'],
+    serverComponentsExternalPackages: ['knex', 'ws'],
   },
 }
 
