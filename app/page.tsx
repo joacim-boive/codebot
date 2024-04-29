@@ -3,9 +3,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
-import { Textarea } from '@/components/ui/textarea'
 
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import Image from 'next/image'
 import { PropagateLoader } from 'react-spinners'
@@ -21,7 +19,7 @@ import {
   SERVER_ERROR,
   SERVER_RETURN_QUESTION_ANSWER,
 } from '@/lib/event-names'
-import { useToast } from '@/components/ui/use-toast'
+import { ChatInput } from '@/components/chat-input'
 
 const messageVariants = {
   initial: { height: 0, opacity: 0 },
@@ -49,14 +47,12 @@ const variantColorMapping: Record<
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([])
-  const [userInput, setUserInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
 
   const containerRef = useRef<HTMLFormElement>(null)
   const conversationId = 1 //TODO handle multiple conversations
   const socketRef = useRef<Socket | null>(null)
-  const { toast } = useToast()
 
   useEffect(() => {
     const initializeSocket = async () => {
@@ -80,12 +76,7 @@ export default function Home() {
       await fetch('/api/socketio')
     } catch (error) {
       console.error('Error initializing socket:', error)
-      toast({
-        title: 'Error initializing socket',
-        description: 'Please try again later',
-        variant: 'destructive',
-        duration: 5000,
-      })
+
       return
     }
 
@@ -100,14 +91,12 @@ export default function Home() {
 
     socketRef.current.on('welcome', () => {
       setIsConnected(true)
-      toast({ variant: 'default', description: 'Socket connected' })
     })
 
     socketRef.current.on(SERVER_RETURN_QUESTION_ANSWER, (data: Message) => {
       setMessages((prevMessages) => [...prevMessages, data])
 
       setIsLoading(!!data.isPending)
-      setUserInput('')
     })
 
     socketRef.current.on(SERVER_COMPILE_PROGRESS, (data: Message) => {
@@ -117,12 +106,6 @@ export default function Home() {
     socketRef.current.on(SERVER_ERROR, (data: Message) => {
       setMessages((prevMessages) => [...prevMessages, data])
       setIsLoading(false)
-      toast({
-        title: 'Error',
-        description: data.content,
-        variant: 'destructive',
-        duration: 5000,
-      })
     })
   }
 
@@ -131,22 +114,6 @@ export default function Home() {
       socketRef.current.emit(messageType, { content })
     }
   }
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        const formEvent = new Event('submit', {
-          bubbles: true,
-          cancelable: true,
-        })
-        handleSubmit(formEvent)
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-
-    return () => window.removeEventListener('keydown', handleKeyDown) // Clean up
-  }, [userInput])
 
   useEffect(() => {
     setIsLoading(true)
@@ -183,8 +150,7 @@ export default function Home() {
     }
   }, [messages])
 
-  const handleSubmit = async (e: React.FormEvent | Event) => {
-    e?.preventDefault()
+  const handleSubmit = async (userInput: string) => {
     setIsLoading(true)
 
     // Add user's input to the messages
@@ -227,17 +193,6 @@ export default function Home() {
         <p>
           Socket connection status: {isConnected ? 'Connected' : 'Disconnected'}
         </p>
-        <Button
-          variant="outline"
-          onClick={() => {
-            toast({
-              title: 'Uh oh! Something went wrong.',
-              description: 'There was a problem with your request.',
-            })
-          }}
-        >
-          Show Toast
-        </Button>
         <Card className="mb-10 border-0 shadow-none">
           <div className="space-y-4">
             {messages.map((message, index) => {
@@ -298,22 +253,7 @@ export default function Home() {
             </div>
           </div>
         </Card>
-        <form
-          ref={containerRef}
-          onSubmit={handleSubmit}
-          className="flex flex-col items-center w-full"
-        >
-          <Textarea
-            required
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            placeholder="Please submit your request for greatness here"
-            className="w-full mb-2"
-          />
-          <Button type="submit" className="w-full">
-            Send
-          </Button>
-        </form>
+        <ChatInput onSubmit={handleSubmit} />
       </div>
     </>
   )

@@ -5,6 +5,7 @@
     "codebot",
     "lucide",
     "shadcn",
+    "socketio",
     "tailwindcss"
   ]
 }
