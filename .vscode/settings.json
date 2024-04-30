@@ -6,6 +6,7 @@
     "lucide",
     "shadcn",
     "socketio",
-    "tailwindcss"
+    "tailwindcss",
+    "TODOS"
   ]
 }
